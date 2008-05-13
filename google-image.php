@@ -23,7 +23,7 @@
 
 class LuckyImage {
   function LuckyImage($query, $cache = true, $start = 0) {
-    $this->query = str_replace(' ', '+', $query);
+    $this->query = urlencode($query);
     $this->cache = $cache;
     $this->start = $start - 1;
     $this->imageData = false;
