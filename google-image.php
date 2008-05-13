@@ -63,17 +63,27 @@ class LuckyImage {
      header('Content-type: image/' . $this->type());
      print($this->image());
   }
+
+  // redirect to the image
+  function redirect() {
+    header('Location: ' . $this->uri());
+  }
 }
 
 if (isset($_GET['q'])) {
   $q = $_GET['q'];
-  $cache = !isset($_GET['noCache']);
-  $start = isset($_GET['p']) ? $_GET['p'] : 1;
+  $start = isset($_GET['p']) ? intval($_GET['p']) : 1;
+  $cache = isset($_GET['cache']) ? intval($_GET['cache']) : 1;
+  $redirect = isset($_GET['redirect']) ? intval($_GET['redirect']) : 1;
 
   $lucky = new LuckyImage($q, $cache, $start);
-  $lucky->printImage();
-}  else {
-  // afficher la doc de ce document  
+  if ($redirect)
+    $lucky->redirect();
+  else
+    $lucky->printImage();
+
+} else {
+  // show the usage by cherry-picking the comments  
   $doc = preg_grep('/^ \*($| [^@])/', explode("\n", file_get_contents(__FILE__)));
   $doc = preg_replace("/\n? \* ?/", "\n", implode("\n", $doc));
   header('Content-type: text/plain');
