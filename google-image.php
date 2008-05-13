@@ -5,15 +5,17 @@
  * This script prints the result of the very first image in a Google Image
  * search for the given query.
  *
- * GET Parameters:
- *  - q= The query
- *  - noCache= shows the original image
- *  - p= which image to start at (defaults to 0)
+ * GET Parameters: 
+ *  - q: the query (string, required)
+ *  - cache: show the cropped cached image instead of the original image (boolean int, defaults to 1)
+ *  - p: which image to start at (positive int, defaults to 0)
+ *  - redirect: redirect to the image rather than display its contents (boolean int, defaults to 1)
  *
  * Examples:
- * - google-image.php?q=escalope
- * - google-image.php?q=escalope&noCache
- * - google-image.php?q=escalope&noCache&p=1
+ * - google-image.php?q=escalope            # => redirect to the cached image
+ * - google-image.php?cache=0&q=escalope    # => redirect to the original image
+ * - google-image.php?q=escalope&p=1        # => redirect to the cached second image
+ * - google-image.php?redirect=0&q=escalope # => print out the cached image
  *
  * @author Benjamin DANON [benjamin.danon@gmail.com]
  * @author Sunny RIPERT [negatif@gmail.com]
@@ -24,8 +26,8 @@
 class LuckyImage {
   function LuckyImage($query, $cache = true, $start = 0) {
     $this->query = urlencode($query);
-    $this->cache = $cache;
-    $this->start = $start - 1;
+    $this->cache = (bool) $cache;
+    $this->start = intval($start) - 1;
     $this->imageData = false;
     $this->search(); // do the search!
   }
@@ -35,7 +37,7 @@ class LuckyImage {
     return "http://images.google.fr/images?q={$this->query}&start={$this->start}";
   }
   
-  // Get search data!
+  // get search data!
   function search() {
     $fileHandle = fopen($this->searchUri(), 'r');
     $fileBuffer = stream_get_contents($fileHandle);
@@ -43,22 +45,22 @@ class LuckyImage {
     $this->imageData = explode('","', $googleCode[1]);
   }
   
-  // Returns the image URI (cached or original)
+  // return the image URI (cached or original)
   function uri() {
     return $this->cache ? $this->imageData[14].'?q=tbn:'.$this->imageData[2] : str_replace('%25', '%', $this->imageData[3]);
   }
   
-  // Returns the image data
+  // return the image data
   function image() {
     return file_get_contents($this->uri());
   }
   
-  // Returns the image format (defaults to jpg)
+  // returns the image format (defaults to jpg)
   function type() {
     return $this->imageData[10] ? $this->imageData[10] : 'jpg';
   }
 
-  // Prints the image with the correct content-type
+  // print the image with the correct content-type
   function printImage() {
      header('Content-type: image/' . $this->type());
      print($this->image());
