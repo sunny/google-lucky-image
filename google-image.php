@@ -19,7 +19,7 @@
  *
  * @author Benjamin DANON [benjamin.danon@gmail.com]
  * @author Sunny RIPERT [negatif@gmail.com]
- * @version 8.04.13
+ * @version 8.05.13
  * @licence http://opensource.org/licenses/lgpl-3.0.html GNU LGPLv3
  */
 
